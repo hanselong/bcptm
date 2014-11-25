@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShoppingCartDemo
 {
@@ -17,7 +14,7 @@ namespace ShoppingCartDemo
             InventoryList defaultList = new InventoryList();
             _inventoryList = defaultList.List;
 
-            // Initialize shopping cart
+            // Initialize empty shopping cart
             _cart = new List<Inventory>();
         }
 
@@ -67,6 +64,9 @@ namespace ShoppingCartDemo
                     break;
                 case 2:
                     // TODO: Not yet implemented
+                    Console.WriteLine("Sorry this feature is not yet implemented.");
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
                     break;
                 case 3:
                     DisplayCart();
@@ -74,7 +74,7 @@ namespace ShoppingCartDemo
                 case 4:
                     // User is exiting.  Do nothing.
                     break;
-                case 5:
+                default:
                     Console.WriteLine("Invalid input.  Please try again.");
                     break;
             }
@@ -85,10 +85,21 @@ namespace ShoppingCartDemo
         /// </summary>
         static void DisplayCart()
         {
+            int cartSize = _cart.Count;
+            Console.WriteLine("There are {0} items in your cart.", cartSize);
+            Console.WriteLine("Your cart has the following items:");
             foreach(Inventory item in _cart)
             {
                 Console.WriteLine(item.DisplayName());
             }
+
+            // Display summary
+            Console.WriteLine();
+            Console.WriteLine("If you were to check out now:");
+            DisplaySummary();
+
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
         }
 
         /// <summary>
@@ -104,7 +115,7 @@ namespace ShoppingCartDemo
                 DisplayPurchaseOptions();
                 userInput = GetPurchaseOption();
 
-                if (userInput <= listSize)
+                if (userInput > 0 && userInput <= listSize)
                 {
                     //Update shopping cart
                     _cart.Add(_inventoryList[(userInput - 1)]);
@@ -116,6 +127,7 @@ namespace ShoppingCartDemo
                 }
                 else
                 {
+                    Console.WriteLine("Invalid user input!");
                     break;
                 }
             } while (true);
