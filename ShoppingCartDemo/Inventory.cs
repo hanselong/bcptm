@@ -12,12 +12,19 @@
     class Inventory
     {
         private String Name { get; set; }
-        private int Price { get; set; }
+
+        private int _price;
+        public int Price {
+            get
+            {
+                return this._price;
+            }
+        }
 
         public Inventory(String name, int price)
         {
             this.Name = name;
-            this.Price = price;
+            this._price = price;
         }
 
         /// <summary>

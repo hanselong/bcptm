@@ -8,21 +8,24 @@ namespace ShoppingCartDemo
 {
     class Program
     {
+        static List<Inventory> _inventoryList;
+
+        static Program()
+        {
+            // Set up the initial inventory to purchase
+            InventoryList defaultList = new InventoryList();
+            _inventoryList = defaultList.List;
+        }
+
         static void Main(string[] args)
         {
             int userInput;
             int subtotal = 0;
 
-            // Set up the initial inventory to purchase
-            List<Inventory> inventoryList = new List<Inventory>();
-            inventoryList.Add(new Inventory("Apple", 1));
-            inventoryList.Add(new Inventory("Grapes", 2));
-            inventoryList.Add(new Inventory("Mango", 3));
-
             // Ask the user to purchase stuff
             do
             {
-                DisplayPurchaseOptions(inventoryList);
+                DisplayPurchaseOptions();
                 userInput = GetPurchaseOption();
 
                 // Update subtotal accordingly
@@ -45,13 +48,16 @@ namespace ShoppingCartDemo
         /// <summary>
         /// Display purchase options for user
         /// </summary>
-        static void DisplayPurchaseOptions(List<Inventory> inventoryList)
+        static void DisplayPurchaseOptions()
         {
+            int listSize = _inventoryList.Count;
             Console.WriteLine("Please choose from the following menu:");
-            Console.WriteLine("1." + inventoryList[0].DisplayName());
-            Console.WriteLine("2." + inventoryList[1].DisplayName());
-            Console.WriteLine("3." + inventoryList[2].DisplayName());
-            Console.WriteLine("4. exit");
+
+            for (int i = 0; i < listSize; i++)
+            {
+                Console.WriteLine("{0}. {1}", (i + 1), _inventoryList[i].DisplayName());
+            }
+            Console.WriteLine("{0}. Exit", (listSize + 1));
             Console.WriteLine("Which one would you like to purchase?");
         }
 
@@ -81,23 +87,13 @@ namespace ShoppingCartDemo
         static int GetSubtotal(int userInput, int subtotal)
         {
             Console.Clear();
-            switch (userInput)
+
+            int listSize = _inventoryList.Count;
+            userInput = userInput - 1;
+            if (userInput < listSize)
             {
-                case 1:
-                    Console.WriteLine("You purchased an apple for $1.00");
-                    subtotal += 1;
-                    break;
-                case 2:
-                    Console.WriteLine("You purchased grapes for $2.00");
-                    subtotal += 2;
-                    break;
-                case 3:
-                    Console.WriteLine("You purchased a mango for $3.00");
-                    subtotal += 3;
-                    break;
-                default:
-                    Console.WriteLine("Please enter a number matching the selection!");
-                    break;
+                Console.WriteLine("You purchased: {0}", _inventoryList[userInput].DisplayName());
+                subtotal += _inventoryList[userInput].Price;
             }
             Console.WriteLine();
             return subtotal;
