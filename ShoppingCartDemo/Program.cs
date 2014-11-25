@@ -9,32 +9,32 @@ namespace ShoppingCartDemo
     class Program
     {
         static List<Inventory> _inventoryList;
+        static List<Inventory> _cart;
 
         static Program()
         {
             // Set up the initial inventory to purchase
             InventoryList defaultList = new InventoryList();
             _inventoryList = defaultList.List;
+
+            // Initialize shopping cart
+            _cart = new List<Inventory>();
         }
 
         static void Main(string[] args)
         {
             int userInput;
-            int subtotal = 0;
 
-            // Ask the user to purchase stuff
+            // Display shopping cart
             do
             {
                 DisplayMenuOptions();
                 userInput = GetPurchaseOption();
-                subtotal = RespondToMenu(userInput, subtotal);
+                RespondToMenu(userInput);
             } while (userInput != 4);
 
             // Display the summary of the transaction
-            if (subtotal > 0)
-            {
-                DisplaySummary(subtotal);
-            }
+            DisplaySummary();
 
             Console.WriteLine("Press any key to end the program.");
             Console.ReadKey();
@@ -45,6 +45,7 @@ namespace ShoppingCartDemo
         /// </summary>
         static void DisplayMenuOptions()
         {
+            Console.Clear();
             Console.WriteLine("Welcome to the shopping cart demo.  Please choose from the following options:");
             Console.WriteLine("1. Purchase items");
             Console.WriteLine("2. Remove items");
@@ -56,18 +57,19 @@ namespace ShoppingCartDemo
         /// Responds to menu selection
         /// </summary>
         /// <param name="userInput">User selection</param>
-        static int RespondToMenu(int userInput, int subtotal)
+        static void RespondToMenu(int userInput)
         {
+            Console.Clear();
             switch (userInput)
             {
                 case 1:
-                    subtotal = AllowPurchasing(subtotal);
+                    AllowPurchasing();
                     break;
                 case 2:
                     // TODO: Not yet implemented
                     break;
                 case 3:
-                    // TODO: Not yet implemented
+                    DisplayCart();
                     break;
                 case 4:
                     // User is exiting.  Do nothing.
@@ -76,29 +78,47 @@ namespace ShoppingCartDemo
                     Console.WriteLine("Invalid input.  Please try again.");
                     break;
             }
-            return subtotal;
+        }
+
+        /// <summary>
+        /// Display everything currently in the shopping cart.
+        /// </summary>
+        static void DisplayCart()
+        {
+            foreach(Inventory item in _cart)
+            {
+                Console.WriteLine(item.DisplayName());
+            }
         }
 
         /// <summary>
         /// Allow user to keep purchasing stuff
         /// </summary>
-        static int AllowPurchasing(int subtotal)
+        static void AllowPurchasing()
         {
             int userInput = 0;
             int listSize = _inventoryList.Count;
             do
             {
+                // Display purchase options
                 DisplayPurchaseOptions();
                 userInput = GetPurchaseOption();
 
-                // Update subtotal accordingly
-                if (userInput > 0)
+                if (userInput <= listSize)
                 {
-                    subtotal = GetSubtotal(userInput, subtotal);
-                }
-            } while (userInput != listSize);
+                    //Update shopping cart
+                    _cart.Add(_inventoryList[(userInput - 1)]);
 
-            return subtotal;
+                    // Show the user what they purchased
+                    Console.Clear();
+                    Console.WriteLine("You purchased: {0}", _inventoryList[(userInput - 1)].DisplayName());
+                    Console.WriteLine();
+                }
+                else
+                {
+                    break;
+                }
+            } while (true);
         }
 
         /// <summary>
@@ -130,36 +150,30 @@ namespace ShoppingCartDemo
             }
             catch
             {
-                Console.WriteLine("Please enter a number matching the selection!");
+                Console.WriteLine("Please enter a whole number!");
             }
             return userInput;
         }
 
         /// <summary>
-        /// Get the subtotal based on user's input
+        /// Get the subtotal from the shopping cart
         /// </summary>
-        /// <param name="userInput">user's input RE: purchasing option</param>
-        /// <returns>Subtotal based on input</returns>
-        static int GetSubtotal(int userInput, int subtotal)
+        static int GetSubtotal()
         {
-            Console.Clear();
-
-            int listSize = _inventoryList.Count;
-            userInput = userInput - 1;
-            if (userInput < listSize)
+            int subtotal = 0;
+            foreach (Inventory item in _cart)
             {
-                Console.WriteLine("You purchased: {0}", _inventoryList[userInput].DisplayName());
-                subtotal += _inventoryList[userInput].Price;
+                subtotal += item.Price;
             }
-            Console.WriteLine();
             return subtotal;
         }
 
         /// <summary>
         /// Display summary of the purchase
         /// </summary>
-        static void DisplaySummary(int subtotal)
+        static void DisplaySummary()
         {
+            int subtotal = GetSubtotal();
             double tax = (double)(subtotal) * (0.095);
             Console.WriteLine("Subtotal: ${0}", subtotal);
             Console.WriteLine("Tax (9.5%): ${0}", tax);
